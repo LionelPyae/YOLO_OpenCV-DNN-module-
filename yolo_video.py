@@ -93,7 +93,6 @@ while True:
     classIDs = []
     cadbury = []
 
-    # print('classID', LABELS[classIDs[i]] == 'cadbury')
 
 # loop over each of the layer outputs
     for output in layerOutputs:
@@ -125,25 +124,20 @@ while True:
                 confidences.append(float(confidence))
                 classIDs.append(classID)
 
-                # for i in classIDs:
-                #     if classIDs[i] == 1:
-                #         cadbury.append(i)
-                #     else:
-                #         print('Other')
-                # print('Cadbury: ', len(cadbury))
     # apply non-maxima suppression to suppress weak, overlapping
     # bounding boxes
+
     idxs = cv2.dnn.NMSBoxes(boxes, confidences, args["confidence"],
                             args["threshold"])
     if len(idxs) > 0:
-
+        print('flatten', idxs.flatten())
         # loop over the indexes we are keeping
         for i in idxs.flatten():
+
             # print('classIDs', classIDs)
             # print('classID', classID)
             # print('confidence :', confidence)
             # extract the bounding box coordinates
-            (x, y) = (boxes[i][0], boxes[i][1])
             (w, h) = (boxes[i][2], boxes[i][3])
             # draw a bounding box rectangle and label on the frame
             color = [int(c) for c in COLORS[classIDs[i]]]
@@ -159,7 +153,9 @@ while True:
                 text1 = "count_Cadbury {}".format(len(idxs))
                 cv2.putText(frame, text1, (50, 50),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-            else:
+            elif LABELS[classIDs[i]] == 'britania':
+                print('boxes: ', boxes)
+                print('confidence: ', confidence)
                 print('idxs :', idxs)
                 print('Britania: ', len(idxs))
                 cv2.putText(frame, text, (x, y - 5),
@@ -169,20 +165,20 @@ while True:
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
 #     # check if the video writer is None
-#     if writer is None:
-#         # initialize our video writer
-#         fourcc = cv2.VideoWriter_fourcc(*"MJPG")
-#         writer = cv2.VideoWriter(args["output"], fourcc, 30,
-#                                  (frame.shape[1], frame.shape[0]), True)
-#         # some information on processing single frame
-#         if total > 0:
-#             elap = (end - start)
-#             print("[INFO] single frame took {:.4f} seconds".format(elap))
-#             print("[INFO] estimated total time to finish: {:.4f}".format(
-#                 elap * total))
-#     # write the output frame to disk
-#     writer.write(frame)
-# # release the file pointers
+    if writer is None:
+        # initialize our video writer
+        fourcc = cv2.VideoWriter_fourcc(*"MJPG")
+        writer = cv2.VideoWriter(args["output"], fourcc, 30,
+                                 (frame.shape[1], frame.shape[0]), True)
+        # some information on processing single frame
+        if total > 0:
+            elap = (end - start)
+            print("[INFO] single frame took {:.4f} seconds".format(elap))
+            print("[INFO] estimated total time to finish: {:.4f}".format(
+                elap * total))
+    # write the output frame to disk
+    writer.write(frame)
+# release the file pointers
 
 print("[INFO] cleaning up...")
 writer.release()
